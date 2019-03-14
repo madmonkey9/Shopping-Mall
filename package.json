@@ -1,0 +1,17 @@
+{
+  "name": "camp12",
+  "version": "1.0.0",
+  "description": "쇼핑몰",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx nodemon ./app.js",
+    "dev": "npx nodemon app.js"
+  },
+  "author": "madmonkey",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "path": "^0.12.7"
+  }
+}
