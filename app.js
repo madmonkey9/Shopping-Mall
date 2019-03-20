@@ -1,5 +1,21 @@
 const express = require("express");
 const path = require("path");
+const logger = require("morgan");
+const bodyParser = require("body-parser");
+
+//MongoDB 접속
+var mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
+
+var db = mongoose.connection;
+db.on("error", console.error);
+db.once("open", function() {
+  console.log("mongodb connect");
+});
+
+mongoose.connect("mongodb://127.0.0.1:27017/fastcampus", {
+  useMongoClient: true
+});
 
 const router = require("./routes/admin");
 
@@ -10,6 +26,11 @@ const port = 3000;
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 console.log(__dirname);
+
+// 미들웨어 셋팅
+app.use(logger("dev"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/", function(_, res) {
   res.send("first app");
