@@ -5,7 +5,12 @@ const moment = require("moment");
 
 // 생성될 필드명을 정한다
 const ProductsSchema = new Schema({
-  name: String, // 제품명
+  name: {
+    // 제품명
+    type: String,
+    required: [true, "제목을 입력해주세요"]
+  },
+  thumbnail: String, //이미지 파일명
   price: Number, // 가격
   description: String, //설명
   created_at: {

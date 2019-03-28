@@ -14,6 +14,12 @@
                 <%=product.getDate.day%>
             </div>
 
+            <% if(product.thumbnail){%>
+            <p>
+            <img src="/uploads/<%=product.thumbnail%>" style="max-width: 100%"/>
+            </p>
+            <% } %>
+
             <%=product.description%>
             
             <!-- 댓글영역  -->
@@ -66,7 +72,6 @@
                             "<div>"
                                 + args.content +
                                 " ( <a class='comment_delete' comment_id='"+ args.id +"'>삭제</a> ) </div>"
-                    
                         );
                         $("#commentForm textarea[name=content]").val("");
                     })
@@ -88,6 +93,23 @@
     //         });
     //     });
     // })(); 
+    $(document).on('click' , '.comment_delete' , function(){
+    if(confirm('삭제하시겠습니까?')){ //확인창 예 눌렀을 시만 진행
+        var $self = $(this);
+        $.ajax({
+            url: '/admin/products/ajax_comment/delete',
+            type: 'POST',
+            data: { comment_id : $self.attr('comment_id') },
+        })
+        .done(function() {
+            $self.parent().remove();
+            alert("삭제가 완료되었습니다.");
+        })
+        .fail(function(args) {
+            console.log(args);
+        });
+    }
+});
     </script>
     
 <% include ../footer.ejs %>
