@@ -3,6 +3,7 @@ const path = require("path");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const loginRequired = require("./libs/loginRequired");
 
 //flash  메시지 관련
 const flash = require("connect-flash");
@@ -27,6 +28,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/fastcampus", {
 
 const admin = require("./routes/admin");
 const accounts = require("./routes/accounts");
+const auth = require("./routes/auth");
+const home = require("./routes/home");
 
 const app = express();
 const port = 3000;
@@ -64,16 +67,22 @@ app.use(passport.session());
 //플래시 메시지 관련
 app.use(flash());
 
-app.get("/", function(_, res) {
-  res.send("first app");
+app.use((req, res, next) => {
+  app.locals.isLogin = req.isAuthenticated();
+  //app.locals.urlparameter = req.url; //현재 url 정보를 보내고 싶으면 이와같이 셋팅
+  //app.locals.userData = req.user; //사용 정보를 보내고 싶으면 이와같이 셋팅
+  next();
 });
+//로그인 정보 뷰에서만 변수로 셋팅, 전체 미들웨어는 router위에 두어야 에러가 안난다
 
 // app.get("/", (req, res) => {
 //   res.send("first app");
 // });
 
-app.use("/admin", admin);
+app.use("/", home);
+app.use("/admin", loginRequired, admin);
 app.use("/accounts", accounts);
+app.use("/auth", auth);
 
 app.listen(port, function() {
   console.log("Express listening on port", port);

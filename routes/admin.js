@@ -52,9 +52,11 @@ router.post(
   "/products/write",
   upload.single("thumbnail"),
   csrfProtection,
-  function(req, res) {
+  (req, res) => {
     req.body.thumbnail = req.file ? req.file.filename : "";
-    var product = new ProductsModel(req.body);
+    req.body.username = req.user.username;
+
+    const product = new ProductsModel(req.body);
 
     if (!product.validateSync()) {
       product.save(function(err) {

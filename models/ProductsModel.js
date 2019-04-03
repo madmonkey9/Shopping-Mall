@@ -17,7 +17,8 @@ const ProductsSchema = new Schema({
     // 작성일
     type: Date,
     default: Date.now()
-  }
+  },
+  username: String // 작성자
 });
 
 // 1씩 증가하는 primary Key를 만든다
