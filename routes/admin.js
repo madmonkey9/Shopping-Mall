@@ -2,6 +2,7 @@ const { Router } = require("express");
 const router = Router();
 const ProductsModel = require("../models/ProductsModel");
 const CommentsModel = require("../models/CommentsModel");
+const co = require("co");
 
 // csurf 셋팅
 const csrf = require("csurf");
@@ -66,16 +67,14 @@ router.post(
   }
 );
 
-router.get("/products/detail/:id", (req, res) => {
-  //url 에서 변수 값을 받아올떈 req.params.id 로 받아온다
-  ProductsModel.findOne({ id: req.params.id }, (err, product) => {
-    CommentsModel.find({ product_id: req.params.id }, function(err, comments) {
-      res.render("admin/productsDetail", {
-        product,
-        comments
-      });
-    });
-  });
+router.get("/products/detail/:id", async (req, res) => {
+  try {
+    const product = await ProductsModel.findOne({ id: req.param.id }).exec();
+    const comments = await CommentsModel.find({
+      product_id: req.param.id
+    }).exec();
+    res.render("admin/productsDetail", { product, comments });
+  } catch (error) {}
 });
 
 router.get("/products/edit/:id", csrfProtection, (req, res) => {

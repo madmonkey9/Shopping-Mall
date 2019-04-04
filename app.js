@@ -30,6 +30,7 @@ const admin = require("./routes/admin");
 const accounts = require("./routes/accounts");
 const auth = require("./routes/auth");
 const home = require("./routes/home");
+const chat = require("./routes/chat");
 
 const app = express();
 const port = 3000;
@@ -49,16 +50,22 @@ app.use(cookieParser());
 app.use("/uploads", express.static("uploads"));
 
 //session 관련 셋팅
-app.use(
-  session({
-    secret: "fastcampus",
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 2000 * 60 * 60 //지속시간 2시간
-    }
+const connectMongo = require("connect-mongo");
+const MongoStore = connectMongo(session);
+
+const sessionMiddleWare = session({
+  secret: "fastcampus",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    maxAge: 2000 * 60 * 60 //지속시간 2시간
+  },
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection,
+    ttl: 14 * 24 * 60 * 60
   })
-);
+});
+app.use(sessionMiddleWare);
 
 //passport 적용
 app.use(passport.initialize());
@@ -83,7 +90,17 @@ app.use("/", home);
 app.use("/admin", loginRequired, admin);
 app.use("/accounts", accounts);
 app.use("/auth", auth);
+app.use("/chat", chat);
 
-app.listen(port, function() {
+const server = app.listen(port, function() {
   console.log("Express listening on port", port);
 });
+const listen = require("socket.io");
+const io = listen(server);
+
+// socket io passport 접근하기 위한 미들웨어 적용
+io.use((socket, next) => {
+  sessionMiddleWare(socket.request, socket.request.res, next);
+});
+
+require("./libs/socketConnection")(io);

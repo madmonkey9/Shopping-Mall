@@ -10,7 +10,9 @@
   "author": "madmonkey",
   "license": "ISC",
   "dependencies": {
+    "co": "^4.6.0",
     "connect-flash": "^0.1.1",
+    "connect-mongo": "^2.0.3",
     "cookie-parser": "^1.4.4",
     "csurf": "^1.9.0",
     "dotenv": "^7.0.0",
@@ -26,6 +28,7 @@
     "passport": "^0.4.0",
     "passport-facebook": "^3.0.0",
     "passport-local": "^1.0.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "socket.io": "^2.2.0"
   }
 }

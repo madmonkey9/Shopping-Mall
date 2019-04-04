@@ -26,6 +26,8 @@ passport.use(
     },
     (accessToken, refreshToken, profile, done) => {
       UserModel.findOne({ username: "fb_" + profile.id }, (err, user) => {
+        console.log(profile);
+
         if (!user) {
           // 없으면 회원가입 후 로그인 성공페이지 이동
           const regData = {
