@@ -9,19 +9,19 @@ module.exports = io => {
     const user = typeof session !== "undefined" ? session.user : "";
 
     // userList 필드에 사용자 명이 존재 하지 않으면 삽입
-    if (userList.indexOf(user.displayname) === -1) {
-      userList.push(user.displayname);
+    if (userList.indexOf(user.displayName) === -1) {
+      userList.push(user.displayName);
     }
     io.emit("join", userList);
 
     socket.on("client message", data => {
       io.emit("server message", {
         message: data.message,
-        displayname: user.displayname
+        displayname: user.displayName
       });
     });
     socket.on("disconnect", () => {
-      userList.removeByValue(user.displayname);
+      userList.removeByValue(user.displayName);
       io.emit("leave", userList);
     });
   });

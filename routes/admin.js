@@ -3,6 +3,7 @@ const router = Router();
 const ProductsModel = require("../models/ProductsModel");
 const CommentsModel = require("../models/CommentsModel");
 const co = require("co");
+const paginate = require("express-paginate");
 
 // csurf 셋팅
 const csrf = require("csurf");
@@ -32,13 +33,23 @@ var upload = multer({ storage: storage });
 
 router.get("/", (_, res) => res.send("admin URL"));
 
-router.get("/products", (_, res) => {
-  // res.send("products URL")
+router.get("/products", paginate.middleware(3, 50), async (req, res) => {
+  const [results, itemCount] = await Promise.all([
+    ProductsModel.find()
+      .sort("-created_at")
+      .limit(req.query.limit)
+      .skip(req.skip)
+      .exec(),
+    ProductsModel.count({})
+  ]);
+  const pageCount = Math.ceil(itemCount / req.query.limit);
 
-  ProductsModel.find({}, (err, products) => {
-    res.render("admin/products", {
-      products
-    });
+  const pages = paginate.getArrayPages(req)(4, pageCount, req.query.page);
+
+  res.render("admin/products", {
+    products: results,
+    pages: pages,
+    pageCount: pageCount
   });
 });
 
@@ -69,10 +80,10 @@ router.post(
 
 router.get("/products/detail/:id", async (req, res) => {
   try {
-    const product = await ProductsModel.findOne({ id: req.param.id }).exec();
+    const product = await ProductsModel.findOne({ id: req.params.id });
     const comments = await CommentsModel.find({
       product_id: req.param.id
-    }).exec();
+    });
     res.render("admin/productsDetail", { product, comments });
   } catch (error) {}
 });
@@ -120,5 +131,13 @@ router.post("/products/ajax_comment/delete", function(req, res) {
     res.json({ message: "success" });
   });
 });
+
+router.post(
+  "/products/ajax_summernote",
+  upload.single("thumbnail"),
+  (req, res) => {
+    res.send("/uploads/" + req.file.filename);
+  }
+);
 
 module.exports = router;

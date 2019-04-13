@@ -31,6 +31,8 @@ const accounts = require("./routes/accounts");
 const auth = require("./routes/auth");
 const home = require("./routes/home");
 const chat = require("./routes/chat");
+const products = require("./routes/products");
+const cart = require("./routes/cart");
 
 const app = express();
 const port = 3000;
@@ -48,6 +50,9 @@ app.use(cookieParser());
 
 // 업로드 path 추가
 app.use("/uploads", express.static("uploads"));
+
+//static path 추가
+app.use("/static", express.static("static"));
 
 //session 관련 셋팅
 const connectMongo = require("connect-mongo");
@@ -91,6 +96,8 @@ app.use("/admin", loginRequired, admin);
 app.use("/accounts", accounts);
 app.use("/auth", auth);
 app.use("/chat", chat);
+app.use("/products", products);
+app.use("/cart", cart);
 
 const server = app.listen(port, function() {
   console.log("Express listening on port", port);
